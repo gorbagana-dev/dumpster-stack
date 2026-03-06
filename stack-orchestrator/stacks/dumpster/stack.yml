@@ -1,0 +1,8 @@
+version: "1.1"
+name: dumpster
+description: "Dumpster Launchpad - full stack (frontend + backend + database + cache)"
+repos:
+  - github.com/gorbagana-chain/dumpster-frontend
+  - github.com/gorbagana-chain/dumpster-backend
+pods:
+  - dumpster
