@@ -45,7 +45,10 @@ Set these in your spec or `config.env`:
 | `ENCRYPTION_KEY` | Yes | - | 32-byte hex (64 chars) encryption key |
 | `PINATA_GATEWAY` | No | `gateway.pinata.cloud` | Pinata gateway URL |
 | `SENTRY_DSN` | No | - | Sentry error tracking DSN |
-| `MIGRATION_KEYPAIR` | No | - | Keypair for on-chain migrations |
+| `MIGRATION_KEYPAIR` | No | - | Base58 secret key for migration bot |
+| `ADMIN_WALLETS` | No | - | Comma-separated admin wallet pubkeys |
+| `CORS_ORIGIN` | No | - | Comma-separated allowed origins |
+| `METADATA_FETCH_ALLOWLIST` | No | - | Comma-separated extra metadata hosts |
 | `DB_USER` | No | `dumpster` | Postgres username |
 | `DB_PASSWORD` | No | `password` | Postgres password |
 | `DB_NAME` | No | `dumpster` | Postgres database name |
