@@ -20,6 +20,10 @@ network:
       routes:
         - path: /
           proxy-to: dumpster-docs:3100
+    - host-name: media.dumpster.cash
+      routes:
+        - path: /
+          proxy-to: dumpster-kubo:8080
   acme-email: admin@gorbagana.wtf
   ports:
     dumpster-db:
