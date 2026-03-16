@@ -39,9 +39,13 @@ network:
     dumpster-docs:
       - '3100'
 volumes:
-  dumpster-db-data: ./data/dumpster-db
-  dumpster-redis-data: ./data/dumpster-redis
-  dumpster-ipfs-data: ./data/dumpster-ipfs
+  # Host-path mounts require Kind extraMounts (cluster recreation).
+  # Using empty paths for now — data persists in local-path-provisioner
+  # inside the Kind container but is lost on cluster deletion.
+  # TODO: add host paths after cluster recreation (see plan)
+  dumpster-db-data:
+  dumpster-redis-data:
+  dumpster-ipfs-data:
 
 config:
   # Database (internal - all containers in same pod, laconic-so rewrites to localhost)
