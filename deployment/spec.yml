@@ -39,9 +39,9 @@ network:
     dumpster-docs:
       - '3100'
 volumes:
-  dumpster-db-data:
-  dumpster-redis-data:
-  dumpster-ipfs-data:
+  dumpster-db-data: ./data/dumpster-db
+  dumpster-redis-data: ./data/dumpster-redis
+  dumpster-ipfs-data: ./data/dumpster-ipfs
 
 config:
   # Blockchain - injected by ansible from live cluster state
