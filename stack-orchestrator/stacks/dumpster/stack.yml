@@ -5,5 +5,9 @@ repos:
   - github.com/gorbagana-dev/dumpster-frontend
   - github.com/gorbagana-dev/dumpster-backend
   - github.com/gorbagana-dev/dumpster-docs
+containers:
+  - cerc/dumpster-backend
+  - cerc/dumpster-frontend
+  - cerc/dumpster-docs
 pods:
   - dumpster
