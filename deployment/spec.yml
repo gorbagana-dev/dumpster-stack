@@ -44,40 +44,25 @@ volumes:
   dumpster-ipfs-data: ./data/dumpster-ipfs
 
 config:
-  # Blockchain - injected by ansible from live cluster state
-  # Placeholder values here; ansible resolves the actual service name at deploy time
-  RPC_URL: ANSIBLE_INJECT
-  WS_RPC_URL: ANSIBLE_INJECT
-
-  # Database (internal - all containers in same pod, use localhost)
-  # Password is shared between postgres container and DATABASE_URL.
-  # Not security-sensitive: DB only accessible within the pod.
+  # Database (internal - all containers in same pod, laconic-so rewrites to localhost)
   DB_USER: dumpster
   DB_NAME: dumpster
   DB_PASSWORD: dumpster-internal
-  DATABASE_URL: postgresql://dumpster:dumpster-internal@localhost:5432/dumpster
-  REDIS_URL: redis://localhost:6379
+  DATABASE_URL: postgresql://dumpster:dumpster-internal@dumpster-db:5432/dumpster
+  REDIS_URL: redis://dumpster-redis:6379
 
-  # Auth & encryption
-  JWT_SECRET: $generate:hex:32$
-  ENCRYPTION_KEY: $generate:hex:32$
-
-  # IPFS (internal kubo - same pod)
-  IPFS_API_URL: http://localhost:5001
+  # IPFS (internal kubo - same pod, laconic-so rewrites to localhost)
+  IPFS_API_URL: http://dumpster-kubo:5001
   IPFS_GATEWAY_URL: https://media.dumpster.cash
 
-  # Cloudflare R2 - credentials loaded from ~/.credentials/dumpster-r2.env on woodburn
+  # Non-secret config that lives in the spec
   R2_BUCKET: dumpster-uploads
   R2_PUBLIC_BASE_URL: https://uploads.dumpster.cash
-
-  # Frontend NEXT_PUBLIC_* vars are baked at build time in Dockerfile.base
-
-  # Backend
   CORS_ORIGIN: https://dumpster.cash
   METADATA_FETCH_ALLOWLIST: uploads.dumpster.cash,media.dumpster.cash
   RUN_MIGRATIONS: 'true'
 
-  # Optional - uncomment and fill when ready
-  # ADMIN_WALLETS: ''
-  # MIGRATION_KEYPAIR: ''
-  # SENTRY_DSN: ''
+  # Injected by ansible at deploy time (not in spec):
+  #   RPC_URL, WS_RPC_URL — from dumpster-rpc.env (resolved from live cluster)
+  #   R2_ACCESS_KEY, R2_SECRET_KEY, R2_ACCOUNT_ID, R2_ENDPOINT — from dumpster-r2.env
+  #   JWT_SECRET, ENCRYPTION_KEY — from dumpster-secrets.env (generated once)
