@@ -24,7 +24,6 @@ network:
       routes:
         - path: /
           proxy-to: dumpster-kubo:8080
-  acme-email: admin@gorbagana.wtf
   ports:
     dumpster-db:
       - '5432'
