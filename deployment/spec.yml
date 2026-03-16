@@ -41,22 +41,24 @@ volumes:
   dumpster-ipfs-data:
 
 config:
-  # Blockchain
-  RPC_URL: https://rpc.gorbagana.wtf
+  # Blockchain (internal cluster service - avoids TLS/WebSocket issues through Caddy)
+  RPC_URL: http://laconic-32d28018d389f5c9-service.laconic-rpc.svc.cluster.local:8899
+  WS_RPC_URL: ws://laconic-32d28018d389f5c9-service.laconic-rpc.svc.cluster.local:8900
 
-  # Database (internal)
+  # Database (internal - all containers in same pod, use localhost)
   DB_USER: dumpster
   DB_NAME: dumpster
   DB_PASSWORD: $generate:hex:16$
-  DATABASE_URL: postgresql://dumpster:${DB_PASSWORD}@dumpster-db:5432/dumpster
+  DATABASE_URL: postgresql://dumpster:password@localhost:5432/dumpster
+  REDIS_URL: redis://localhost:6379
 
   # Auth & encryption
   JWT_SECRET: $generate:hex:32$
   ENCRYPTION_KEY: $generate:hex:32$
 
-  # IPFS (internal kubo)
-  IPFS_API_URL: http://dumpster-kubo:5001
-  IPFS_GATEWAY_URL: http://dumpster-kubo:8080
+  # IPFS (internal kubo - same pod)
+  IPFS_API_URL: http://localhost:5001
+  IPFS_GATEWAY_URL: http://localhost:8080
 
   # Cloudflare R2 - credentials loaded from ~/.credentials/dumpster-r2.env on woodburn
   R2_BUCKET: dumpster-uploads
