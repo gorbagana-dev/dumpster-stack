@@ -32,7 +32,7 @@ services:
       retries: 10
 
   dumpster-kubo:
-    image: gorbagana-dev/dumpster-kubo:local
+    image: ghcr.io/gorbagana-dev/dumpster-kubo:latest
     restart: unless-stopped
     volumes:
       - dumpster-ipfs-data:/data/ipfs
@@ -54,7 +54,7 @@ services:
       start_period: 30s
 
   dumpster-backend:
-    image: gorbagana-dev/dumpster-backend:local
+    image: ghcr.io/gorbagana-dev/dumpster-backend:latest
     restart: unless-stopped
     depends_on:
       dumpster-db:
@@ -98,7 +98,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   dumpster-frontend:
-    image: gorbagana-dev/dumpster-frontend:local
+    image: ghcr.io/gorbagana-dev/dumpster-frontend:latest
     restart: unless-stopped
     depends_on:
       dumpster-backend:
@@ -119,7 +119,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   dumpster-docs:
-    image: gorbagana-dev/dumpster-docs:local
+    image: ghcr.io/gorbagana-dev/dumpster-docs:latest
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-production}

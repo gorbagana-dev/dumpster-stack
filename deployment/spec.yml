@@ -38,6 +38,12 @@ network:
       - '3000'
     dumpster-docs:
       - '3100'
+# Registry authentication for private GHCR images
+registry-credentials:
+  server: ghcr.io
+  username: gorbagana-dev
+  token-env: REGISTRY_TOKEN
+
 volumes:
   # Host-path mounts require Kind extraMounts (cluster recreation).
   # Using empty paths for now — data persists in local-path-provisioner
