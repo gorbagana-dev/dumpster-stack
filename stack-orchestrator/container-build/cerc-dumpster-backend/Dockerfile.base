@@ -1,4 +1,4 @@
-FROM oven/bun:1.1-debian AS builder
+FROM oven/bun:1.2-debian AS builder
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY src ./src
 COPY drizzle ./drizzle
 COPY drizzle.config.ts tsconfig.json ./
 
-FROM oven/bun:1.1-debian
+FROM oven/bun:1.2-debian
 
 RUN apt-get update && apt-get install -y \
     netcat-openbsd \
