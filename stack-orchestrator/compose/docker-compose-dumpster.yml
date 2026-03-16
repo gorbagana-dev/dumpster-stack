@@ -31,13 +31,32 @@ services:
       timeout: 5s
       retries: 10
 
+  dumpster-kubo:
+    image: ipfs/kubo:v0.33.2
+    restart: unless-stopped
+    volumes:
+      - dumpster-ipfs-data:/data/ipfs
+    ports:
+      - "5001"
+      - "8080"
+    environment:
+      IPFS_PATH: /data/ipfs
+    healthcheck:
+      test: ["CMD", "ipfs", "id"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
   dumpster-backend:
-    image: cerc/dumpster-backend:local
+    image: gorbagana-dev/dumpster-backend:local
     restart: unless-stopped
     depends_on:
       dumpster-db:
         condition: service_healthy
       dumpster-redis:
+        condition: service_healthy
+      dumpster-kubo:
         condition: service_healthy
     environment:
       NODE_ENV: ${NODE_ENV:-production}
@@ -52,8 +71,8 @@ services:
       R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
       R2_ENDPOINT: ${R2_ENDPOINT}
       R2_PUBLIC_BASE_URL: ${R2_PUBLIC_BASE_URL}
-      PINATA_JWT: ${PINATA_JWT}
-      PINATA_GATEWAY: ${PINATA_GATEWAY:-gateway.pinata.cloud}
+      IPFS_API_URL: ${IPFS_API_URL:-http://dumpster-kubo:5001}
+      IPFS_GATEWAY_URL: ${IPFS_GATEWAY_URL:-http://dumpster-kubo:8080}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       MIGRATION_KEYPAIR: ${MIGRATION_KEYPAIR:-}
       ADMIN_WALLETS: ${ADMIN_WALLETS:-}
@@ -74,7 +93,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   dumpster-frontend:
-    image: cerc/dumpster-frontend:local
+    image: gorbagana-dev/dumpster-frontend:local
     restart: unless-stopped
     depends_on:
       dumpster-backend:
@@ -82,10 +101,6 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${FRONTEND_PORT:-3000}
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://dumpster-backend:3200}
-      NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://dumpster-backend:3200/ws}
-      NEXT_PUBLIC_RPC_URL: ${NEXT_PUBLIC_RPC_URL:-http://127.0.0.1:8899}
-      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://dumpster.cash}
       CERC_SCRIPT_DEBUG: ${CERC_SCRIPT_DEBUG}
     ports:
       - "${FRONTEND_HOST_PORT:-3000}:3000"
@@ -98,6 +113,23 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  dumpster-docs:
+    image: gorbagana-dev/dumpster-docs:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${DOCS_PORT:-3100}
+      CERC_SCRIPT_DEBUG: ${CERC_SCRIPT_DEBUG}
+    ports:
+      - "${DOCS_HOST_PORT:-3100}:3100"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3100/"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
 volumes:
   dumpster-db-data:
   dumpster-redis-data:
+  dumpster-ipfs-data:

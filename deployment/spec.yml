@@ -1,0 +1,75 @@
+# Dumpster Launchpad deployment spec - GitOps managed
+# This file is the source of truth for deployment configuration
+# Edit and commit to update the deployment
+stack: stack-orchestrator/stacks/dumpster
+deploy-to: k8s-kind
+network:
+  http-proxy:
+    - host-name: dumpster.cash
+      routes:
+        - path: /
+          proxy-to: dumpster-frontend:3000
+    - host-name: api.dumpster.cash
+      routes:
+        - path: /
+          proxy-to: dumpster-backend:3200
+        - path: /ws
+          proxy-to: dumpster-backend:3200
+          websocket: true
+    - host-name: docs.dumpster.cash
+      routes:
+        - path: /
+          proxy-to: dumpster-docs:3100
+  acme-email: admin@gorbagana.wtf
+  ports:
+    dumpster-db:
+      - '5432'
+    dumpster-redis:
+      - '6379'
+    dumpster-kubo:
+      - '5001'
+      - '8080'
+    dumpster-backend:
+      - '3200'
+    dumpster-frontend:
+      - '3000'
+    dumpster-docs:
+      - '3100'
+volumes:
+  dumpster-db-data:
+  dumpster-redis-data:
+  dumpster-ipfs-data:
+
+config:
+  # Blockchain
+  RPC_URL: https://rpc.gorbagana.wtf
+
+  # Database (internal)
+  DB_USER: dumpster
+  DB_NAME: dumpster
+  DB_PASSWORD: $generate:hex:16$
+  DATABASE_URL: postgresql://dumpster:${DB_PASSWORD}@dumpster-db:5432/dumpster
+
+  # Auth & encryption
+  JWT_SECRET: $generate:hex:32$
+  ENCRYPTION_KEY: $generate:hex:32$
+
+  # IPFS (internal kubo)
+  IPFS_API_URL: http://dumpster-kubo:5001
+  IPFS_GATEWAY_URL: http://dumpster-kubo:8080
+
+  # Cloudflare R2 - credentials loaded from ~/.credentials/dumpster-r2.env on woodburn
+  R2_BUCKET: dumpster-uploads
+  R2_PUBLIC_BASE_URL: https://uploads.dumpster.cash
+
+  # Frontend NEXT_PUBLIC_* vars are baked at build time in Dockerfile.base
+
+  # Backend
+  CORS_ORIGIN: https://dumpster.cash
+  METADATA_FETCH_ALLOWLIST: uploads.dumpster.cash,media.dumpster.cash
+  RUN_MIGRATIONS: 'true'
+
+  # Optional - uncomment and fill when ready
+  # ADMIN_WALLETS: ''
+  # MIGRATION_KEYPAIR: ''
+  # SENTRY_DSN: ''

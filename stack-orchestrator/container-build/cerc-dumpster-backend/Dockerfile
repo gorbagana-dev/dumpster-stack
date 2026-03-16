@@ -1,4 +1,4 @@
-FROM cerc/dumpster-backend-base:local
+FROM gorbagana-dev/dumpster-backend-base:local
 
 COPY ./scripts/start.sh /scripts/
 
