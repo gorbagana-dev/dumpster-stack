@@ -44,15 +44,18 @@ volumes:
   dumpster-ipfs-data:
 
 config:
-  # Blockchain (internal cluster service - avoids TLS/WebSocket issues through Caddy)
-  RPC_URL: http://laconic-32d28018d389f5c9-service.laconic-rpc.svc.cluster.local:8899
-  WS_RPC_URL: ws://laconic-32d28018d389f5c9-service.laconic-rpc.svc.cluster.local:8900
+  # Blockchain - injected by ansible from live cluster state
+  # Placeholder values here; ansible resolves the actual service name at deploy time
+  RPC_URL: ANSIBLE_INJECT
+  WS_RPC_URL: ANSIBLE_INJECT
 
   # Database (internal - all containers in same pod, use localhost)
+  # Password is shared between postgres container and DATABASE_URL.
+  # Not security-sensitive: DB only accessible within the pod.
   DB_USER: dumpster
   DB_NAME: dumpster
-  DB_PASSWORD: $generate:hex:16$
-  DATABASE_URL: postgresql://dumpster:password@localhost:5432/dumpster
+  DB_PASSWORD: dumpster-internal
+  DATABASE_URL: postgresql://dumpster:dumpster-internal@localhost:5432/dumpster
   REDIS_URL: redis://localhost:6379
 
   # Auth & encryption
