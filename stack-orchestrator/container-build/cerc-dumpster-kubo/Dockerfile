@@ -1,13 +1,17 @@
 FROM golang:1.23-alpine AS builder
 
-RUN apk add --no-cache git make
+RUN apk add --no-cache git make bash
 
 WORKDIR /app
 RUN git clone https://github.com/ipfs/kubo.git --depth=1 --branch=v0.33.2 .
 
 # Add go-ds-s3 plugin compiled into the binary
-RUN go get github.com/ipfs/go-ds-s3/plugin@latest
+# 1. Add to preload list so preload.sh generates the import
 RUN echo -en "\ns3ds github.com/ipfs/go-ds-s3/plugin 0" >> plugin/loader/preload_list
+# 2. Generate preload.go with the import
+RUN bash plugin/loader/preload.sh > plugin/loader/preload.go
+# 3. Now go get resolves the import and go mod tidy keeps it
+RUN go get github.com/ipfs/go-ds-s3/plugin@latest
 RUN go mod tidy
 RUN make build
 
