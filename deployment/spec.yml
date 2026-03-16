@@ -61,6 +61,7 @@ config:
 
   # Non-secret config that lives in the spec
   R2_BUCKET: dumpster-uploads
+  R2_IPFS_BUCKET: dumpster-ipfs
   R2_PUBLIC_BASE_URL: https://uploads.dumpster.cash
   CORS_ORIGIN: https://dumpster.cash
   METADATA_FETCH_ALLOWLIST: uploads.dumpster.cash,media.dumpster.cash

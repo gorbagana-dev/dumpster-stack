@@ -9,5 +9,6 @@ containers:
   - cerc/dumpster-backend
   - cerc/dumpster-frontend
   - cerc/dumpster-docs
+  - cerc/dumpster-kubo
 pods:
   - dumpster

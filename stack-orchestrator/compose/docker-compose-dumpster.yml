@@ -32,7 +32,7 @@ services:
       retries: 10
 
   dumpster-kubo:
-    image: ipfs/kubo:v0.33.2
+    image: gorbagana-dev/dumpster-kubo:local
     restart: unless-stopped
     volumes:
       - dumpster-ipfs-data:/data/ipfs
@@ -41,12 +41,17 @@ services:
       - "8080:8080"
     environment:
       IPFS_PATH: /data/ipfs
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
+      R2_IPFS_BUCKET: ${R2_IPFS_BUCKET:-dumpster-ipfs}
+      AWS_ACCESS_KEY_ID: ${R2_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${R2_SECRET_KEY}
+      CERC_SCRIPT_DEBUG: ${CERC_SCRIPT_DEBUG}
     healthcheck:
       test: ["CMD", "ipfs", "id"]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 10s
+      start_period: 30s
 
   dumpster-backend:
     image: gorbagana-dev/dumpster-backend:local
