@@ -62,7 +62,7 @@ config:
 
   # IPFS (internal kubo - same pod)
   IPFS_API_URL: http://localhost:5001
-  IPFS_GATEWAY_URL: http://localhost:8080
+  IPFS_GATEWAY_URL: https://media.dumpster.cash
 
   # Cloudflare R2 - credentials loaded from ~/.credentials/dumpster-r2.env on woodburn
   R2_BUCKET: dumpster-uploads
