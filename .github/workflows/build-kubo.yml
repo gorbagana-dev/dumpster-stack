@@ -41,3 +41,12 @@ jobs:
         run: |
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Notify deploy webhook
+        if: success()
+        continue-on-error: true
+        run: |
+          curl -sf -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}/deploy/notify" \
+            -H "Authorization: Bearer ${{ secrets.DEPLOY_WEBHOOK_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"image\": \"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}\", \"service\": \"dumpster-kubo\"}"
