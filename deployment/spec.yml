@@ -54,15 +54,15 @@ volumes:
   dumpster-ipfs-data:
 
 config:
-  # Database (internal - all containers in same pod, laconic-so rewrites to localhost)
+  # Database (all containers share localhost in laconic-so's single-pod model)
   DB_USER: dumpster
   DB_NAME: dumpster
   DB_PASSWORD: dumpster-internal
-  DATABASE_URL: postgresql://dumpster:dumpster-internal@dumpster-db:5432/dumpster
-  REDIS_URL: redis://dumpster-redis:6379
+  DATABASE_URL: postgresql://dumpster:dumpster-internal@localhost:5432/dumpster
+  REDIS_URL: redis://localhost:6379
 
-  # IPFS (internal kubo - same pod, laconic-so rewrites to localhost)
-  IPFS_API_URL: http://dumpster-kubo:5001
+  # IPFS (kubo in same pod)
+  IPFS_API_URL: http://localhost:5001
   IPFS_GATEWAY_URL: https://media.dumpster.cash
 
   # Non-secret config that lives in the spec
