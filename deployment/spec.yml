@@ -43,6 +43,11 @@ image-pull-secret:
   server: ghcr.io
   username: gorbagana-dev
   token-env: REGISTRY_TOKEN
+credentials-files:
+  - ~/.credentials/dumpster-secrets.env
+  - ~/.credentials/dumpster-r2.env
+  - ~/.credentials/dumpster-ipfs-r2.env
+  - ~/.credentials/dumpster-rpc.env
 
 volumes:
   # Host-path mounts require Kind extraMounts (cluster recreation).
@@ -72,8 +77,3 @@ config:
   CORS_ORIGIN: https://dumpster.cash
   METADATA_FETCH_ALLOWLIST: uploads.dumpster.cash,media.dumpster.cash
   RUN_MIGRATIONS: 'true'
-
-  # Injected by ansible at deploy time (not in spec):
-  #   RPC_URL, WS_RPC_URL — from dumpster-rpc.env (resolved from live cluster)
-  #   R2_ACCESS_KEY, R2_SECRET_KEY, R2_ACCOUNT_ID, R2_ENDPOINT — from dumpster-r2.env
-  #   JWT_SECRET, ENCRYPTION_KEY — from dumpster-secrets.env (generated once)
