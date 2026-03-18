@@ -5,6 +5,11 @@ if [ -n "$CERC_SCRIPT_DEBUG" ]; then
     set -x
 fi
 
+# Remove stale lock file from previous unclean shutdown.
+# We are the only process in this container — if the lock exists at
+# boot, it's stale by definition.
+rm -f "$IPFS_PATH/repo.lock"
+
 # Initialize kubo if not already done
 if [ ! -f "$IPFS_PATH/config" ]; then
     echo "Initializing kubo..."
@@ -49,8 +54,20 @@ if [ ! -f "$IPFS_PATH/config" ]; then
           "$IPFS_PATH/config" > "$IPFS_PATH/config.tmp" && \
           mv "$IPFS_PATH/config.tmp" "$IPFS_PATH/config"
 
-        # Remove the datastore_spec so it gets regenerated from config
-        rm -f "$IPFS_PATH/datastore_spec"
+        # Regenerate datastore_spec from the modified config.
+        # ipfs daemon requires datastore_spec to match Datastore.Spec in config.
+        # The spec format strips internal fields (child, prefix, compression,
+        # workers, etc.) — only keeps mountpoint, path, type, and s3-specific
+        # fields (bucket, region, rootDirectory).
+        jq -c '.Datastore.Spec | .mounts = [.mounts[] | {
+          mountpoint,
+          type: (if .child.type == "s3ds" then null else .child.type end),
+          path: .child.path,
+          bucket: .child.bucket,
+          region: .child.region,
+          rootDirectory: .child.rootDirectory
+        } | with_entries(select(.value != null))]' \
+          "$IPFS_PATH/config" > "$IPFS_PATH/datastore_spec"
         echo "R2 datastore configured: bucket=$R2_IPFS_BUCKET"
     else
         echo "WARNING: R2 credentials not set, using local storage only"
