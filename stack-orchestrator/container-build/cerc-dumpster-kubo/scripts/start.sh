@@ -55,18 +55,16 @@ if [ ! -f "$IPFS_PATH/config" ]; then
           mv "$IPFS_PATH/config.tmp" "$IPFS_PATH/config"
 
         # Regenerate datastore_spec from the modified config.
-        # ipfs daemon requires datastore_spec to match Datastore.Spec in config.
-        # The spec format strips internal fields (child, prefix, compression,
-        # workers, etc.) — only keeps mountpoint, path, type, and s3-specific
-        # fields (bucket, region, rootDirectory).
-        jq -c '.Datastore.Spec | .mounts = [.mounts[] | {
-          mountpoint,
-          type: (if .child.type == "s3ds" then null else .child.type end),
-          path: .child.path,
-          bucket: .child.bucket,
-          region: .child.region,
-          rootDirectory: .child.rootDirectory
-        } | with_entries(select(.value != null))]' \
+        # ipfs daemon requires datastore_spec to match Datastore.Spec exactly.
+        # Kubo's on-disk format flattens each mount's .child into the mount
+        # entry (adding .mountpoint), strips internal fields (prefix,
+        # compression, workers, regionEndpoint, accessKey, secretKey), and
+        # removes .type for s3ds mounts. Keys are sorted alphabetically.
+        jq -Sc '{type: .Datastore.Spec.type, mounts: [.Datastore.Spec.mounts[] |
+          {mountpoint} + (.child |
+            del(.regionEndpoint, .accessKey, .secretKey, .workers, .prefix, .compression) |
+            if .type == "s3ds" then del(.type) else . end
+          )]}' \
           "$IPFS_PATH/config" > "$IPFS_PATH/datastore_spec"
         echo "R2 datastore configured: bucket=$R2_IPFS_BUCKET"
     else
