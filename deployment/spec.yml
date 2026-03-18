@@ -39,7 +39,7 @@ network:
     dumpster-docs:
       - '3100'
 # Registry authentication for private GHCR images
-registry-credentials:
+image-pull-secret:
   server: ghcr.io
   username: gorbagana-dev
   token-env: REGISTRY_TOKEN
