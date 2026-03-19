@@ -27,7 +27,8 @@ ENV IPFS_PATH=/data/ipfs
 ARG R2_IPFS_BUCKET=dumpster-ipfs
 ARG R2_ACCOUNT_ID=52c20c98f552c6af17369284bd9a78b2
 
-RUN ipfs init --profile=server \
+RUN mkdir -p "$IPFS_PATH" \
+    && ipfs init --profile=server \
     && ipfs config Addresses.API '/ip4/0.0.0.0/tcp/5001' \
     && ipfs config Addresses.Gateway '/ip4/0.0.0.0/tcp/8080' \
     && jq --arg endpoint "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" --arg bucket "$R2_IPFS_BUCKET" '.Datastore.Spec = {"mounts":[{"child":{"type":"s3ds","region":"auto","bucket":$bucket,"rootDirectory":"blocks","regionEndpoint":$endpoint,"accessKey":"","secretKey":"","workers":8},"mountpoint":"/blocks","prefix":"s3.datastore","type":"measure"},{"child":{"compression":"none","path":"datastore","type":"levelds"},"mountpoint":"/","prefix":"leveldb.datastore","type":"measure"}],"type":"mount"}' "$IPFS_PATH/config" > "$IPFS_PATH/config.tmp" \
