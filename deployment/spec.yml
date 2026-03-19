@@ -48,6 +48,7 @@ credentials-files:
   - ~/.credentials/dumpster-r2.env
   - ~/.credentials/dumpster-ipfs-r2.env
   - ~/.credentials/dumpster-rpc.env
+  - ~/.credentials/dumpster-pg-backups-r2.env
 
 volumes:
   # Host-path mounts require Kind extraMounts (cluster recreation).

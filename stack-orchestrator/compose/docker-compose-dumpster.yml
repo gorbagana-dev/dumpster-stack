@@ -1,12 +1,17 @@
 services:
   dumpster-db:
-    image: postgres:14-alpine
+    image: ghcr.io/gorbagana-dev/dumpster-db:latest
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER:-dumpster}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
       POSTGRES_DB: ${DB_NAME:-dumpster}
       POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
+      PGBACKREST_REPO1_S3_KEY: ${PGBACKREST_REPO1_S3_KEY}
+      PGBACKREST_REPO1_S3_KEY_SECRET: ${PGBACKREST_REPO1_S3_KEY_SECRET}
+      PGBACKREST_REPO1_S3_BUCKET: ${PGBACKREST_REPO1_S3_BUCKET:-dumpster-pg-backups}
+      PGBACKREST_REPO1_S3_ENDPOINT: ${PGBACKREST_REPO1_S3_ENDPOINT:-52c20c98f552c6af17369284bd9a78b2.r2.cloudflarestorage.com}
+      PGBACKREST_REPO1_S3_REGION: ${PGBACKREST_REPO1_S3_REGION:-auto}
     volumes:
       - dumpster-db-data:/var/lib/postgresql/data
     ports:
