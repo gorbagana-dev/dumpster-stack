@@ -56,7 +56,6 @@ volumes:
   # TODO: add host paths after cluster recreation (see plan)
   dumpster-db-data:
   dumpster-redis-data:
-  dumpster-ipfs-data:
 
 config:
   # Database (all containers share localhost in laconic-so's single-pod model)
