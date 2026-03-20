@@ -2,7 +2,7 @@ services:
   dumpster-maintenance:
     image: caddy:alpine
     ports:
-      - "8000:8000"
+      - "8000"
     volumes:
       - ./maintenance:/srv
     command: caddy file-server --root /srv --listen :8000
