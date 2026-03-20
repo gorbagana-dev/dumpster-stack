@@ -66,6 +66,10 @@ services:
         # from the IPFS network.
         ipfs config Routing.Type none
         ipfs config --json Swarm.DisableNatPortMap true
+        # NoFetch: serve only blocks in our S3 datastore. Without this
+        # the gateway hangs trying to resolve CIDs from the network
+        # (which is disabled).
+        ipfs config --json Gateway.NoFetch true
         exec ipfs daemon --migrate
     healthcheck:
       test: ["CMD", "ipfs", "id"]
