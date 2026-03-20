@@ -4,5 +4,8 @@ services:
     ports:
       - "8000"
     volumes:
-      - ./maintenance:/srv
+      - maintenance-html:/srv
     command: caddy file-server --root /srv --listen :8000
+
+volumes:
+  maintenance-html:
