@@ -12,3 +12,4 @@ containers:
   - cerc/dumpster-kubo
 pods:
   - dumpster
+  - dumpster-maintenance

@@ -38,6 +38,9 @@ network:
       - '3000'
     dumpster-docs:
       - '3100'
+# Maintenance page served during deployment restarts (Recreate strategy).
+# The maintenance pod uses RollingUpdate and stays up while main pods restart.
+maintenance-service: dumpster-maintenance:8000
 # Registry authentication for private GHCR images
 image-pull-secret:
   server: ghcr.io
