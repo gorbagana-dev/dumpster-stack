@@ -45,7 +45,7 @@ maintenance-service: dumpster-maintenance:8000
 image-pull-secret:
   server: ghcr.io
   username: gorbagana-dev
-  token-env: REGISTRY_TOKEN
+  token-file: ~/.credentials/ghcr_token
 credentials-files:
   - ~/.credentials/dumpster-secrets.env
   - ~/.credentials/dumpster-r2.env

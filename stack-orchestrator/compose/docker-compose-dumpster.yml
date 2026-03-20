@@ -70,6 +70,9 @@ services:
         # the gateway hangs trying to resolve CIDs from the network
         # (which is disabled).
         ipfs config --json Gateway.NoFetch true
+        # Disable GC entirely. go-ds-s3 implements Delete() — if GC
+        # ever runs, it deletes blocks from R2. There's no recovery.
+        ipfs config Datastore.GCPeriod 0s
         exec ipfs daemon --migrate
     healthcheck:
       test: ["CMD", "ipfs", "id"]
