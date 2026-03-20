@@ -61,6 +61,11 @@ services:
           )"
           echo "Injected S3 credentials into ipfs datastore config"
         fi
+        # Disable DHT/swarm — kubo is a pure S3-backed gateway, not a
+        # network participant. Blocks are served from R2, not fetched
+        # from the IPFS network.
+        ipfs config Routing.Type none
+        ipfs config --json Swarm.DisableNatPortMap true
         exec ipfs daemon --migrate
     healthcheck:
       test: ["CMD", "ipfs", "id"]
