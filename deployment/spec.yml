@@ -57,13 +57,13 @@ configmaps:
   # Maintenance page HTML served by caddy during restarts
   maintenance-html: stack-orchestrator/compose/maintenance
 
+# Single Kind extraMount: /srv/kind → /mnt. All volumes under this root
+# persist on the ZFS dataset (woodburn/DATA/srv/kind) and survive cluster
+# deletion. New volumes can be added without cluster recreation.
+kind-mount-root: /srv/kind
 volumes:
-  # TODO ds-i9i: add kind-mount-root + absolute host paths after merging
-  # kind-mount-root branch to laconic-so main and creating /srv/kind ZFS
-  # dataset on woodburn. Until then, data is in local-path-provisioner
-  # (survives pod restart, lost on cluster deletion).
-  dumpster-db-data:
-  dumpster-redis-data:
+  dumpster-db-data: /srv/kind/dumpster/db
+  dumpster-redis-data: /srv/kind/dumpster/redis
 
 config:
   # Database (all containers share localhost in laconic-so's single-pod model)
