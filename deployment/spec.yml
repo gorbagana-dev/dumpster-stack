@@ -58,13 +58,12 @@ configmaps:
   maintenance-html: stack-orchestrator/compose/maintenance
 
 volumes:
-  # Host-path mounts persist data on the Docker host via Kind extraMounts.
-  # Relative paths resolve to deployment_dir/data/<path> on the host and
-  # /mnt/<volume-name> inside the Kind node.
-  # IMPORTANT: changing these paths requires cluster recreation to update
-  # Kind extraMounts config.
-  dumpster-db-data: dumpster-db
-  dumpster-redis-data: dumpster-redis
+  # TODO ds-i9i: add kind-mount-root + absolute host paths after merging
+  # kind-mount-root branch to laconic-so main and creating /srv/kind ZFS
+  # dataset on woodburn. Until then, data is in local-path-provisioner
+  # (survives pod restart, lost on cluster deletion).
+  dumpster-db-data:
+  dumpster-redis-data:
 
 config:
   # Database (all containers share localhost in laconic-so's single-pod model)
