@@ -5,21 +5,23 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
-        # Configure mc alias before starting so healthcheck works
-        mc alias set local https://localhost:443 \
-          $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD} --insecure
-
         # Start MinIO with TLS on port 443
         minio server /data --address ":443" --console-address ":9001" \
           --certs-dir /certs &
         MINIO_PID=$$!
 
-        # Wait for MinIO, then create buckets
-        until mc ready local --insecure 2>/dev/null; do sleep 1; done
+        # Wait for server to be ready
+        until curl -kfs https://localhost:443/minio/health/live >/dev/null 2>&1; do
+          sleep 1
+        done
+
+        # Now configure mc alias and create buckets
+        mc alias set local https://localhost:443 \
+          $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD} --insecure
         mc mb --ignore-existing local/dumpster-uploads --insecure
         mc mb --ignore-existing local/dumpster-ipfs --insecure
         mc anonymous set download local/dumpster-uploads --insecure
-        echo "MinIO ready with TLS on :443"
+        echo "MinIO ready with TLS on :443, buckets created"
 
         wait $$MINIO_PID
     environment:
@@ -31,11 +33,11 @@ services:
     volumes:
       - minio-certs:/certs:ro
     healthcheck:
-      test: ["CMD", "mc", "ready", "local", "--insecure"]
+      test: ["CMD", "curl", "-kfs", "https://localhost:443/minio/health/live"]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 15s
+      start_period: 20s
 
 volumes:
   minio-certs:
