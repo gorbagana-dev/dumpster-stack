@@ -49,6 +49,13 @@ image-pull-secret:
   server: ghcr.io
   username: gorbagana-dev
   token-file: ~/.credentials/ghcr_token
+# External service routing — laconic-so creates k8s Services for these.
+# In production: ExternalName (DNS CNAME to provider).
+# In testing: headless Service + Endpoints (routes to mock pod).
+external-services:
+  s3:
+    host: 52c20c98f552c6af17369284bd9a78b2.r2.cloudflarestorage.com
+    port: 443
 credentials-files:
   - ~/.credentials/dumpster-secrets.env
   - ~/.credentials/dumpster-r2.env
@@ -80,7 +87,8 @@ config:
   IPFS_API_URL: http://localhost:5001
   IPFS_GATEWAY_URL: https://media.dumpster.cash
 
-  # Non-secret config that lives in the spec
+  # S3/R2 — endpoint routes via external-services k8s Service
+  R2_ENDPOINT: https://s3:443
   R2_BUCKET: dumpster-uploads
   R2_IPFS_BUCKET: dumpster-ipfs
   R2_PUBLIC_BASE_URL: https://uploads.dumpster.cash

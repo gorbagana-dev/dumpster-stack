@@ -25,13 +25,16 @@ RUN chmod +x /scripts/start.sh
 
 ENV IPFS_PATH=/data/ipfs
 ARG R2_IPFS_BUCKET=dumpster-ipfs
-ARG R2_ACCOUNT_ID=52c20c98f552c6af17369284bd9a78b2
+# S3 endpoint is set to the k8s Service name. In production, laconic-so
+# creates an ExternalName Service that routes to R2. In testing, a headless
+# Service routes to MinIO. The application config is identical either way.
+ARG S3_ENDPOINT=https://s3:443
 
 RUN mkdir -p "$IPFS_PATH" \
     && ipfs init --profile=server \
     && ipfs config Addresses.API '/ip4/0.0.0.0/tcp/5001' \
     && ipfs config Addresses.Gateway '/ip4/0.0.0.0/tcp/8080' \
-    && jq --arg endpoint "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" --arg bucket "$R2_IPFS_BUCKET" '.Datastore.Spec = {"mounts":[{"child":{"type":"s3ds","region":"auto","bucket":$bucket,"rootDirectory":"blocks","regionEndpoint":$endpoint,"accessKey":"","secretKey":"","workers":8},"mountpoint":"/blocks","prefix":"s3.datastore","type":"measure"},{"child":{"compression":"none","path":"datastore","type":"levelds"},"mountpoint":"/","prefix":"leveldb.datastore","type":"measure"}],"type":"mount"}' "$IPFS_PATH/config" > "$IPFS_PATH/config.tmp" \
+    && jq --arg endpoint "$S3_ENDPOINT" --arg bucket "$R2_IPFS_BUCKET" '.Datastore.Spec = {"mounts":[{"child":{"type":"s3ds","region":"auto","bucket":$bucket,"rootDirectory":"blocks","regionEndpoint":$endpoint,"accessKey":"","secretKey":"","workers":8},"mountpoint":"/blocks","prefix":"s3.datastore","type":"measure"},{"child":{"compression":"none","path":"datastore","type":"levelds"},"mountpoint":"/","prefix":"leveldb.datastore","type":"measure"}],"type":"mount"}' "$IPFS_PATH/config" > "$IPFS_PATH/config.tmp" \
     && mv "$IPFS_PATH/config.tmp" "$IPFS_PATH/config" \
     && jq -Sc '{type:.Datastore.Spec.type,mounts:[.Datastore.Spec.mounts[]|{mountpoint}+(.child|del(.regionEndpoint,.accessKey,.secretKey,.workers,.prefix,.compression)|if .type=="s3ds" then del(.type) else . end)]}' "$IPFS_PATH/config" > "$IPFS_PATH/datastore_spec"
 

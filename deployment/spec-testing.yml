@@ -1,7 +1,5 @@
-# Dumpster Launchpad LOCAL deployment spec
-# Uses the SAME stack as production. Only domains, credentials, and
-# volume paths differ. R2 endpoints are written dynamically by the
-# deploy playbook after discovering the mocks deployment's MinIO service.
+# Dumpster Launchpad TESTING deployment spec
+# Same stack as production. External services route to mock pods.
 # See: woodburn_deployer/ansible/playbooks/local/
 stack: stack-orchestrator/stacks/dumpster
 deploy-to: k8s-kind
@@ -42,19 +40,25 @@ network:
     dumpster-docs:
       - '3100'
 maintenance-service: dumpster-maintenance:8000
+# External services route to mock pods instead of real providers.
+# The s3 Service resolves to the MinIO pod in the mocks namespace.
+external-services:
+  s3:
+    selector:
+      app: dumpster-mocks
+    namespace: laconic-dumpster-mocks
+    port: 443
+# Trust mkcert root CA so containers accept MinIO's TLS cert.
+# Production specs omit this key — public CAs are trusted by default.
+ca-certificates:
+  - ~/.local/share/mkcert/rootCA.pem
 image-pull-secret:
   server: ghcr.io
   username: gorbagana-dev
   token-file: ~/.credentials/ghcr_token
-# R2 and RPC credentials are written dynamically by the deploy playbook.
-# - dumpster-local-secrets.env: JWT_SECRET, ENCRYPTION_KEY
-# - dumpster-local-r2.env: R2_* pointing at MinIO service DNS
-# - dumpster-local-ipfs-r2.env: R2_IPFS_* for kubo's go-ds-s3
-# - dumpster-local-rpc.env: RPC_URL
 credentials-files:
   - ~/.credentials/dumpster-local-secrets.env
   - ~/.credentials/dumpster-local-r2.env
-  - ~/.credentials/dumpster-local-ipfs-r2.env
   - ~/.credentials/dumpster-local-rpc.env
 
 configmaps:
@@ -73,6 +77,9 @@ config:
   REDIS_URL: redis://localhost:6379
   IPFS_API_URL: http://localhost:5001
   IPFS_GATEWAY_URL: https://media.dumpster.local
+  # S3 endpoint — same URL as production. The external-services
+  # k8s Service routes to MinIO instead of R2.
+  R2_ENDPOINT: https://s3:443
   R2_BUCKET: dumpster-uploads
   R2_PUBLIC_BASE_URL: https://media.dumpster.local
   CORS_ORIGIN: https://dumpster.local
