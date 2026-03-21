@@ -3,6 +3,7 @@
 # Edit and commit to update the deployment
 stack: stack-orchestrator/stacks/dumpster
 deploy-to: k8s-kind
+namespace: laconic-dumpster
 network:
   http-proxy:
     - host-name: dumpster.cash
