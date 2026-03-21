@@ -1,0 +1,6 @@
+version: "1.1"
+name: dumpster-mocks
+description: "Mock external services for dumpster local testing (MinIO for R2/S3)"
+containers: []
+pods:
+  - dumpster-mocks

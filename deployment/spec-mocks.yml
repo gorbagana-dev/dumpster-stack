@@ -1,0 +1,15 @@
+# Mock external services for local dumpster testing.
+# Deploys MinIO (S3-compatible) as a replacement for Cloudflare R2.
+# Deploy this BEFORE the dumpster stack — the dumpster deploy playbook
+# discovers the MinIO service DNS and configures R2 endpoints.
+stack: stack-orchestrator/stacks/dumpster-mocks
+deploy-to: k8s-kind
+namespace: laconic-dumpster-mocks
+network:
+  ports:
+    dumpster-minio:
+      - '9000'
+      - '9001'
+config:
+  MINIO_ROOT_USER: dumpsterlocaldev2026minioadmkeys
+  MINIO_ROOT_PASSWORD: dumpsterlocaldev2026minioadmkeys

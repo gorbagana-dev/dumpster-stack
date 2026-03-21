@@ -1,0 +1,80 @@
+# Dumpster Launchpad LOCAL deployment spec
+# Uses the SAME stack as production. Only domains, credentials, and
+# volume paths differ. R2 endpoints are written dynamically by the
+# deploy playbook after discovering the mocks deployment's MinIO service.
+# See: woodburn_deployer/ansible/playbooks/local/
+stack: stack-orchestrator/stacks/dumpster
+deploy-to: k8s-kind
+namespace: laconic-dumpster
+network:
+  http-proxy:
+    - host-name: dumpster.local
+      routes:
+        - path: /
+          proxy-to: dumpster-frontend:3000
+    - host-name: api.dumpster.local
+      routes:
+        - path: /
+          proxy-to: dumpster-backend:3200
+        - path: /ws
+          proxy-to: dumpster-backend:3200
+          websocket: true
+    - host-name: docs.dumpster.local
+      routes:
+        - path: /
+          proxy-to: dumpster-docs:3100
+    - host-name: media.dumpster.local
+      routes:
+        - path: /
+          proxy-to: dumpster-kubo:8080
+  ports:
+    dumpster-db:
+      - '5432'
+    dumpster-redis:
+      - '6379'
+    dumpster-kubo:
+      - '5001'
+      - '8080'
+    dumpster-backend:
+      - '3200'
+    dumpster-frontend:
+      - '3000'
+    dumpster-docs:
+      - '3100'
+maintenance-service: dumpster-maintenance:8000
+image-pull-secret:
+  server: ghcr.io
+  username: gorbagana-dev
+  token-file: ~/.credentials/ghcr_token
+# R2 and RPC credentials are written dynamically by the deploy playbook.
+# - dumpster-local-secrets.env: JWT_SECRET, ENCRYPTION_KEY
+# - dumpster-local-r2.env: R2_* pointing at MinIO service DNS
+# - dumpster-local-ipfs-r2.env: R2_IPFS_* for kubo's go-ds-s3
+# - dumpster-local-rpc.env: RPC_URL
+credentials-files:
+  - ~/.credentials/dumpster-local-secrets.env
+  - ~/.credentials/dumpster-local-r2.env
+  - ~/.credentials/dumpster-local-ipfs-r2.env
+  - ~/.credentials/dumpster-local-rpc.env
+
+configmaps:
+  maintenance-html: stack-orchestrator/compose/maintenance
+
+kind-mount-root: /srv/kind
+volumes:
+  dumpster-db-data: /srv/kind/dumpster-local/db
+  dumpster-redis-data: /srv/kind/dumpster-local/redis
+
+config:
+  DB_USER: dumpster
+  DB_NAME: dumpster
+  DB_PASSWORD: dumpster-local
+  DATABASE_URL: postgresql://dumpster:dumpster-local@localhost:5432/dumpster
+  REDIS_URL: redis://localhost:6379
+  IPFS_API_URL: http://localhost:5001
+  IPFS_GATEWAY_URL: https://media.dumpster.local
+  R2_BUCKET: dumpster-uploads
+  R2_PUBLIC_BASE_URL: https://media.dumpster.local
+  CORS_ORIGIN: https://dumpster.local
+  METADATA_FETCH_ALLOWLIST: media.dumpster.local
+  RUN_MIGRATIONS: 'true'

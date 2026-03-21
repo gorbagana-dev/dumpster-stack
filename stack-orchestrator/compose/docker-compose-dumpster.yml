@@ -46,18 +46,24 @@ services:
       IPFS_PATH: /data/ipfs
       AWS_ACCESS_KEY_ID: ${R2_IPFS_ACCESS_KEY}
       AWS_SECRET_ACCESS_KEY: ${R2_IPFS_SECRET_KEY}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
       CERC_SCRIPT_DEBUG: ${CERC_SCRIPT_DEBUG}
-    # Inject R2/S3 credentials into ipfs datastore config before starting.
-    # go-ds-s3 reads from config file, not env vars.
+    # Inject S3 credentials (and optionally endpoint) into ipfs datastore
+    # config before starting. go-ds-s3 reads from config file, not env vars.
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
         rm -f "$$IPFS_PATH/repo.lock"
         if [ -n "$$AWS_ACCESS_KEY_ID" ] && [ -n "$$AWS_SECRET_ACCESS_KEY" ]; then
+          ENDPOINT_SED=""
+          if [ -n "$$S3_ENDPOINT" ]; then
+            ENDPOINT_SED="s|\"regionEndpoint\": \"[^\"]*\"|\"regionEndpoint\": \"$$S3_ENDPOINT\"|"
+          fi
           ipfs config --json Datastore.Spec.mounts "$$(
             ipfs config --json Datastore.Spec.mounts |
             sed "s|\"accessKey\": \"[^\"]*\"|\"accessKey\": \"$$AWS_ACCESS_KEY_ID\"|" |
-            sed "s|\"secretKey\": \"[^\"]*\"|\"secretKey\": \"$$AWS_SECRET_ACCESS_KEY\"|"
+            sed "s|\"secretKey\": \"[^\"]*\"|\"secretKey\": \"$$AWS_SECRET_ACCESS_KEY\"|" |
+            if [ -n "$$ENDPOINT_SED" ]; then sed "$$ENDPOINT_SED"; else cat; fi
           )"
           echo "Injected S3 credentials into ipfs datastore config"
         fi

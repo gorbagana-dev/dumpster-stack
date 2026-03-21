@@ -1,0 +1,33 @@
+services:
+  dumpster-minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        # Start MinIO in the background
+        minio server /data --console-address ":9001" &
+        MINIO_PID=$$!
+
+        # Wait for MinIO to be ready, then create buckets
+        until mc ready local 2>/dev/null; do sleep 1; done
+        mc alias set local http://localhost:9000 dumpsterlocaldev2026minioadmkeys dumpsterlocaldev2026minioadmkeys
+        mc mb --ignore-existing local/dumpster-uploads
+        mc mb --ignore-existing local/dumpster-ipfs
+        mc anonymous set download local/dumpster-uploads
+        echo "MinIO ready with buckets"
+
+        # Foreground the server
+        wait $$MINIO_PID
+    environment:
+      MINIO_ROOT_USER: dumpsterlocaldev2026minioadmkeys
+      MINIO_ROOT_PASSWORD: dumpsterlocaldev2026minioadmkeys
+    ports:
+      - "9000"
+      - "9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
