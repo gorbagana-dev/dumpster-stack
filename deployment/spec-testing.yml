@@ -52,6 +52,8 @@ external-services:
 # Production specs omit this key — public CAs are trusted by default.
 ca-certificates:
   - ~/.local/share/mkcert/rootCA.pem
+# Use locally-built images loaded via kind load, not GHCR pulls.
+image-pull-policy: IfNotPresent
 image-pull-secret:
   server: ghcr.io
   username: gorbagana-dev
@@ -86,3 +88,5 @@ config:
   CORS_ORIGIN: https://dumpster.local
   METADATA_FETCH_ALLOWLIST: media.dumpster.local
   RUN_MIGRATIONS: 'true'
+  # Debug: enable go-ds-s3 logging to diagnose MinIO auth issue (ds-v22v)
+  GOLOG_LOG_LEVEL: info
