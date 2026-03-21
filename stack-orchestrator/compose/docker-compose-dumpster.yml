@@ -46,8 +46,9 @@ services:
       IPFS_PATH: /data/ipfs
       AWS_ACCESS_KEY_ID: ${R2_IPFS_ACCESS_KEY}
       AWS_SECRET_ACCESS_KEY: ${R2_IPFS_SECRET_KEY}
+      S3_REGION: ${S3_REGION:-auto}
       CERC_SCRIPT_DEBUG: ${CERC_SCRIPT_DEBUG}
-    # Inject S3 credentials into ipfs datastore config before starting.
+    # Inject S3 credentials and region into ipfs datastore config.
     # go-ds-s3 reads from config file, not env vars. The regionEndpoint
     # is baked into the image as https://s3:443 — routing to the actual
     # S3 backend (R2 or MinIO) is handled by laconic-so external-services.
@@ -55,13 +56,24 @@ services:
     command:
       - |
         rm -f "$$IPFS_PATH/repo.lock"
+        # If extra CA certs are mounted, add them to the system trust store.
+        # This is needed for Go's x509 on Alpine (reads ca-certificates.crt bundle).
+        for ca in /etc/ssl/certs/laconic-extra-ca-*.pem; do
+          [ -f "$$ca" ] && cp "$$ca" /usr/local/share/ca-certificates/laconic-extra-ca.crt && \
+            update-ca-certificates 2>/dev/null && \
+            echo "Added extra CA to system trust store" && break
+        done
         if [ -n "$$AWS_ACCESS_KEY_ID" ] && [ -n "$$AWS_SECRET_ACCESS_KEY" ]; then
           ipfs config --json Datastore.Spec.mounts "$$(
             ipfs config --json Datastore.Spec.mounts |
             sed "s|\"accessKey\": \"[^\"]*\"|\"accessKey\": \"$$AWS_ACCESS_KEY_ID\"|" |
-            sed "s|\"secretKey\": \"[^\"]*\"|\"secretKey\": \"$$AWS_SECRET_ACCESS_KEY\"|"
+            sed "s|\"secretKey\": \"[^\"]*\"|\"secretKey\": \"$$AWS_SECRET_ACCESS_KEY\"|" |
+            sed "s|\"region\": \"[^\"]*\"|\"region\": \"$$S3_REGION\"|"
           )"
-          echo "Injected S3 credentials into ipfs datastore config"
+          # Regenerate datastore_spec to match the updated config.
+          # IPFS validates config against this file on startup.
+          jq -Sc '{type:.Datastore.Spec.type,mounts:[.Datastore.Spec.mounts[]|{mountpoint}+(.child|del(.regionEndpoint,.accessKey,.secretKey,.workers,.prefix,.compression)|if .type=="s3ds" then del(.type) else . end)]}' "$$IPFS_PATH/config" > "$$IPFS_PATH/datastore_spec"
+          echo "Injected S3 credentials (region=$$S3_REGION) into ipfs datastore config"
         fi
         # Disable DHT/swarm — kubo is a pure S3-backed gateway, not a
         # network participant. Blocks are served from R2, not fetched

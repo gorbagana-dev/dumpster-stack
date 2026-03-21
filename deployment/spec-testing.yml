@@ -45,7 +45,7 @@ maintenance-service: dumpster-maintenance:8000
 external-services:
   s3:
     selector:
-      app: dumpster-mocks
+      app.kubernetes.io/stack: dumpster-mocks
     namespace: laconic-dumpster-mocks
     port: 443
 # Trust mkcert root CA so containers accept MinIO's TLS cert.
@@ -77,9 +77,10 @@ config:
   REDIS_URL: redis://localhost:6379
   IPFS_API_URL: http://localhost:5001
   IPFS_GATEWAY_URL: https://media.dumpster.local
-  # S3 endpoint — same URL as production. The external-services
-  # k8s Service routes to MinIO instead of R2.
+  # S3 — same endpoint URL as production. external-services routes
+  # to MinIO. Region must be us-east-1 for MinIO (R2 uses "auto").
   R2_ENDPOINT: https://s3:443
+  S3_REGION: us-east-1
   R2_BUCKET: dumpster-uploads
   R2_PUBLIC_BASE_URL: https://media.dumpster.local
   CORS_ORIGIN: https://dumpster.local
