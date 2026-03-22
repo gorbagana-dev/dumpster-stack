@@ -86,5 +86,9 @@ config:
   CORS_ORIGIN: https://dumpster.local
   METADATA_FETCH_ALLOWLIST: media.dumpster.local
   RUN_MIGRATIONS: 'true'
+
+# Override container images for testing (production spec omits this)
+image-overrides:
+  dumpster-kubo: ghcr.io/gorbagana-dev/dumpster-kubo:test-s3-routing
   # Debug: enable go-ds-s3 logging to diagnose MinIO auth issue (ds-v22v)
   GOLOG_LOG_LEVEL: info
