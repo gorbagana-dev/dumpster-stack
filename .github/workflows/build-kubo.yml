@@ -35,7 +35,8 @@ jobs:
           if [ "${{ github.ref_name }}" = "master" ]; then
             echo "tag=latest" >> "$GITHUB_OUTPUT"
           else
-            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            # Sanitize branch name for Docker tag (replace / with -)
+            echo "tag=$(echo '${{ github.ref_name }}' | tr '/' '-')" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build kubo image
