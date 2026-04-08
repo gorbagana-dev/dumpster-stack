@@ -69,6 +69,62 @@ volumes:
   dumpster-db-data: /srv/kind/dumpster-local/db
   dumpster-redis-data: /srv/kind/dumpster-local/redis
 
+# Override SO's DEFAULT_CONTAINER_RESOURCES (1 CPU / 2000M per container).
+# At the default, the 6-container dumpster pod alone asks for 12G of memory
+# requests, which does not fit on a dev laptop. Values below are tuned for
+# idle/light local dev workloads, not production throughput.
+resources:
+  containers:
+    dumpster-db:
+      reservations:
+        cpus: "0.1"
+        memory: 256M
+      limits:
+        cpus: "1.0"
+        memory: 1G
+    dumpster-redis:
+      reservations:
+        cpus: "0.05"
+        memory: 128M
+      limits:
+        cpus: "0.5"
+        memory: 512M
+    dumpster-kubo:
+      reservations:
+        cpus: "0.1"
+        memory: 384M
+      limits:
+        cpus: "1.0"
+        memory: 1G
+    dumpster-backend:
+      reservations:
+        cpus: "0.2"
+        memory: 512M
+      limits:
+        cpus: "1.5"
+        memory: 1500M
+    dumpster-frontend:
+      reservations:
+        cpus: "0.2"
+        memory: 768M
+      limits:
+        cpus: "1.5"
+        memory: 2G
+    dumpster-docs:
+      reservations:
+        cpus: "0.05"
+        memory: 256M
+      limits:
+        cpus: "0.5"
+        memory: 512M
+    dumpster-maintenance:
+      reservations:
+        cpus: "0.05"
+        memory: 64M
+      limits:
+        cpus: "0.5"
+        memory: 256M
+
 config:
   DB_USER: dumpster
   DB_NAME: dumpster
