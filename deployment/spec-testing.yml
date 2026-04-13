@@ -142,6 +142,11 @@ config:
   CORS_ORIGIN: https://dumpster.local
   METADATA_FETCH_ALLOWLIST: media.dumpster.local
   RUN_MIGRATIONS: 'true'
+  # Frontend runtime URL overrides (replaces build-time defaults in start.sh)
+  NEXT_PUBLIC_API_URL: https://api.dumpster.local
+  NEXT_PUBLIC_WS_URL: wss://api.dumpster.local/ws
+  NEXT_PUBLIC_RPC_URL: http://localhost:8899
+  NEXT_PUBLIC_SITE_URL: https://dumpster.local
 
 # Override container images for testing (production spec omits this)
 image-overrides:
