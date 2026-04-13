@@ -150,6 +150,5 @@ config:
 
 # Override container images for testing (production spec omits this)
 image-overrides:
+  dumpster-frontend: gorbagana-dev/dumpster-frontend:local
   dumpster-kubo: ghcr.io/gorbagana-dev/dumpster-kubo:test-s3-routing
-  # Debug: enable go-ds-s3 logging to diagnose MinIO auth issue (ds-v22v)
-  GOLOG_LOG_LEVEL: info
