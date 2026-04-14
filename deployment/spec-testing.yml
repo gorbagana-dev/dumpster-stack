@@ -150,5 +150,4 @@ config:
 
 # Override container images for testing (production spec omits this)
 image-overrides:
-  dumpster-frontend: gorbagana-dev/dumpster-frontend:local
   dumpster-kubo: ghcr.io/gorbagana-dev/dumpster-kubo:test-s3-routing
