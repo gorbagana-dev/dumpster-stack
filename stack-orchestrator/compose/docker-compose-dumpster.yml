@@ -47,6 +47,7 @@ services:
       AWS_ACCESS_KEY_ID: ${R2_IPFS_ACCESS_KEY}
       AWS_SECRET_ACCESS_KEY: ${R2_IPFS_SECRET_KEY}
       S3_REGION: ${S3_REGION:-auto}
+      R2_ENDPOINT: ${R2_ENDPOINT:-https://s3:443}
       CERC_SCRIPT_DEBUG: ${CERC_SCRIPT_DEBUG}
     # Inject S3 credentials and region into ipfs datastore config.
     # go-ds-s3 reads from config file, not env vars. The regionEndpoint
@@ -68,7 +69,8 @@ services:
             ipfs config --json Datastore.Spec.mounts |
             sed "s|\"accessKey\": \"[^\"]*\"|\"accessKey\": \"$$AWS_ACCESS_KEY_ID\"|" |
             sed "s|\"secretKey\": \"[^\"]*\"|\"secretKey\": \"$$AWS_SECRET_ACCESS_KEY\"|" |
-            sed "s|\"region\": \"[^\"]*\"|\"region\": \"$$S3_REGION\"|"
+            sed "s|\"region\": \"[^\"]*\"|\"region\": \"$$S3_REGION\"|" |
+            sed "s|\"regionEndpoint\": \"[^\"]*\"|\"regionEndpoint\": \"$$R2_ENDPOINT\"|"
           )"
           # Regenerate datastore_spec to match the updated config.
           # IPFS validates config against this file on startup.
