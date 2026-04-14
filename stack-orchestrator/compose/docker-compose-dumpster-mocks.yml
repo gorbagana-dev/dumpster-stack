@@ -31,6 +31,7 @@ services:
       - "443"
       - "9001"
     volumes:
+      - minio-data:/data
       - minio-certs:/certs:ro
     healthcheck:
       test: ["CMD", "curl", "-kfs", "https://localhost:443/minio/health/live"]
@@ -40,4 +41,5 @@ services:
       start_period: 20s
 
 volumes:
+  minio-data:
   minio-certs:
