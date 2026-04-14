@@ -1,0 +1,45 @@
+services:
+  dumpster-minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        # Start MinIO with TLS on port 443
+        minio server /data --address ":443" --console-address ":9001" \
+          --certs-dir /certs &
+        MINIO_PID=$$!
+
+        # Wait for server to be ready
+        until curl -kfs https://localhost:443/minio/health/live >/dev/null 2>&1; do
+          sleep 1
+        done
+
+        # Now configure mc alias and create buckets
+        mc alias set local https://localhost:443 \
+          $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD} --insecure
+        mc mb --ignore-existing local/dumpster-uploads --insecure
+        mc mb --ignore-existing local/dumpster-ipfs --insecure
+        mc anonymous set download local/dumpster-uploads --insecure
+        echo "MinIO ready with TLS on :443, buckets created"
+
+        wait $$MINIO_PID
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-dumpsterlocaldev2026minioadmkeys}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-dumpsterlocaldev2026minioadmkeys}
+    ports:
+      - "443"
+      - "9001"
+    volumes:
+      - minio-data:/data
+      - minio-certs:/certs:ro
+    healthcheck:
+      test: ["CMD", "curl", "-kfs", "https://localhost:443/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  minio-data:
+  minio-certs:
