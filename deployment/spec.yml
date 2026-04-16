@@ -5,6 +5,7 @@ stack: stack-orchestrator/stacks/dumpster
 deploy-to: k8s-kind
 namespace: laconic-dumpster
 network:
+  acme-email: admin@gorbagana.wtf
   http-proxy:
     - host-name: dumpster.cash
       routes:
