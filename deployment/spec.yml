@@ -72,6 +72,9 @@ volumes:
   dumpster-db-data: /srv/kind/dumpster/db
   dumpster-redis-data: /srv/kind/dumpster/redis
 
+# Caddy image is cluster-scoped; dumpster owns it for the woodburn cluster.
+caddy-ingress-image: ghcr.io/laconicnetwork/caddy-ingress:latest
+
 config:
   # Database (all containers share localhost in laconic-so's single-pod model)
   DB_USER: dumpster
