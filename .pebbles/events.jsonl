@@ -50,3 +50,5 @@
 {"type":"close","timestamp":"2026-04-27T07:12:41.28226256Z","issue_id":"ds-q17q","payload":{}}
 {"type":"comment","timestamp":"2026-04-27T07:12:41.386770398Z","issue_id":"ds-m13m","payload":{"body":"Fixed. HTTP server now starts immediately even if RPC is unreachable. Global state loads in the background with exponential backoff retries. Routes that need it return 503 until it is ready."}}
 {"type":"close","timestamp":"2026-04-27T07:12:41.492838564Z","issue_id":"ds-m13m","payload":{}}
+{"type":"comment","timestamp":"2026-04-27T11:46:27.258223766Z","issue_id":"ds-x24x","payload":{"body":"Verified that deployment restart (used by stack_restart role) handles spec sync correctly — image-pull-secret changes and config updates are picked up on restart. Namespace rename is not handled: old namespace keeps running and PVs remain bound to it, leaving new namespace pods stuck in Pending. Correct flow for namespace rename: delete the old namespace first, then run deployment restart — PVs transition to Released state and get rebound to the new namespace automatically."}}
+{"type":"close","timestamp":"2026-04-27T11:46:27.364838573Z","issue_id":"ds-x24x","payload":{}}
