@@ -148,6 +148,14 @@ config:
   NEXT_PUBLIC_RPC_URL: http://localhost:8899
   NEXT_PUBLIC_SITE_URL: https://dumpster.local
 
-# Override container images for testing (production spec omits this)
+# Override container images for testing (production spec omits this).
+# To run a service with a locally-built image instead of GHCR's :latest,
+# uncomment the matching entry below. Requires `laconic-so build-containers`
+# to produce the :local image and `kind load docker-image` to push it
+# into the cluster — both handled by deploy_local.yml in woodburn_deployer.
 image-overrides:
-  dumpster-kubo: ghcr.io/gorbagana-dev/dumpster-kubo:test-s3-routing
+  # dumpster-db: gorbagana-dev/dumpster-db:local
+  # dumpster-frontend: gorbagana-dev/dumpster-frontend:local
+  # dumpster-backend: gorbagana-dev/dumpster-backend:local
+  # dumpster-kubo: gorbagana-dev/dumpster-kubo:local
+  # dumpster-docs: gorbagana-dev/dumpster-docs:local
