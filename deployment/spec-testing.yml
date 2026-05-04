@@ -150,9 +150,7 @@ config:
 
 # Override container images for testing (production spec omits this).
 # To run a service with a locally-built image instead of GHCR's :latest,
-# uncomment the matching entry below. Requires `laconic-so build-containers`
-# to produce the :local image and `kind load docker-image` to push it
-# into the cluster — both handled by deploy_local.yml in woodburn_deployer.
+# uncomment the matching entry below.
 image-overrides:
   # dumpster-db: gorbagana-dev/dumpster-db:local
   # dumpster-frontend: gorbagana-dev/dumpster-frontend:local
