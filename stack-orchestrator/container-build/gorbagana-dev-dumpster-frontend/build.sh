@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 source ${CERC_CONTAINER_BASE_DIR}/build-base.sh
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+# Reuse the Dockerfiles from the dumpster-frontend repo so this build
+# matches what CI publishes to GHCR. Avoids drift between local and
+# published images.
 
 docker build -t gorbagana-dev/dumpster-frontend-base:local \
     ${build_command_args} \
-    -f ${SCRIPT_DIR}/Dockerfile.base \
+    -f ${CERC_REPO_BASE_DIR}/dumpster-frontend/docker/Dockerfile.base \
     ${CERC_REPO_BASE_DIR}/dumpster-frontend
 
 if [[ $? -ne 0 ]]; then
@@ -15,5 +17,5 @@ fi
 
 docker build -t gorbagana-dev/dumpster-frontend:local \
     ${build_command_args} \
-    -f ${SCRIPT_DIR}/Dockerfile \
-    ${SCRIPT_DIR}
+    -f ${CERC_REPO_BASE_DIR}/dumpster-frontend/docker/Dockerfile \
+    ${CERC_REPO_BASE_DIR}/dumpster-frontend/docker

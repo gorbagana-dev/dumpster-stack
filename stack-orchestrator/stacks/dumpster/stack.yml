@@ -6,10 +6,11 @@ repos:
   - github.com/gorbagana-dev/dumpster-backend
   - github.com/gorbagana-dev/dumpster-docs
 containers:
-  # - cerc/dumpster-backend  # built in dumpster-backend repo; see ds-9b7 for local image support
-  - cerc/dumpster-frontend
-  - cerc/dumpster-docs
-  - cerc/dumpster-kubo
+  - gorbagana-dev/dumpster-backend
+  - gorbagana-dev/dumpster-frontend
+  - gorbagana-dev/dumpster-docs
+  - gorbagana-dev/dumpster-kubo
+  - gorbagana-dev/dumpster-db
 pods:
   - dumpster
   - dumpster-maintenance

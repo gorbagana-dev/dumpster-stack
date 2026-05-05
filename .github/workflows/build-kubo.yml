@@ -5,7 +5,7 @@ on:
   push:
     branches: [master]
     paths:
-      - 'stack-orchestrator/container-build/cerc-dumpster-kubo/**'
+      - 'stack-orchestrator/container-build/gorbagana-dev-dumpster-kubo/**'
 
 env:
   REGISTRY: ghcr.io
@@ -44,8 +44,8 @@ jobs:
           docker build \
             -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
             -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            -f stack-orchestrator/container-build/cerc-dumpster-kubo/Dockerfile \
-            stack-orchestrator/container-build/cerc-dumpster-kubo
+            -f stack-orchestrator/container-build/gorbagana-dev-dumpster-kubo/Dockerfile \
+            stack-orchestrator/container-build/gorbagana-dev-dumpster-kubo
 
       - name: Push to GHCR
         run: |
