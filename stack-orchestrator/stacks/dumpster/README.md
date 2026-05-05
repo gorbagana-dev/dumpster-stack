@@ -20,8 +20,8 @@ Frontend at `http://localhost:3000`, API at `http://localhost:3200`.
 
 | Service | Image | Port | Description |
 |---------|-------|------|-------------|
-| dumpster-frontend | cerc/dumpster-frontend:local | 3000 | Next.js web app |
-| dumpster-backend | cerc/dumpster-backend:local | 3200 | Bun + Hono API with WebSocket + BullMQ workers |
+| dumpster-frontend | gorbagana-dev/dumpster-frontend:local | 3000 | Next.js web app |
+| dumpster-backend | gorbagana-dev/dumpster-backend:local | 3200 | Bun + Hono API with WebSocket + BullMQ workers |
 | dumpster-db | postgres:14-alpine | (internal) | PostgreSQL database |
 | dumpster-redis | redis:7-alpine | (internal) | Redis for caching + job queues |
 
