@@ -95,3 +95,4 @@ config:
   CORS_ORIGIN: https://dumpster.cash
   METADATA_FETCH_ALLOWLIST: uploads.dumpster.cash,media.dumpster.cash
   RUN_MIGRATIONS: 'true'
+  ADMIN_WALLETS: 'AVo78DBTZ6fzzg38PoedEj46Z46H48et45WY2KTEtTj8,D8vaPdzxHyDGLQTRFR3iw3ttnfgxUuyNhfx9WEBr6H3c'
